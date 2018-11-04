@@ -6,4 +6,6 @@
     <string name="todo_detail_label">detail of what to do</string>
     <string name="todo_complete_label">is it complete?</string>
     <string name="todo_date">Todo date</string>
+    <string name="todo">TODO</string>
+    <string name="take_photo">Take Photo</string>
 </resources>

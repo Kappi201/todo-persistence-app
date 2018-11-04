@@ -24,6 +24,10 @@ public class Todo {
         mId = id;
     }
 
+    public String getPhotoFilename() {
+        return "img_" + getId().toString() + ".jpg";
+    }
+
     public String getTitle() {
         return mTitle;
     }

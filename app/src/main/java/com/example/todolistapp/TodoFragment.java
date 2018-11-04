@@ -1,8 +1,16 @@
 package com.example.todolistapp;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -14,17 +22,26 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 public class TodoFragment extends Fragment {
 
     private static final String ARG_TODO_ID = "todo_id";
+    private static final int REQUEST_PHOTO = 2;
 
     private Todo mTodo;
     private EditText mEditTextTitle;
     private Button mButtonDate;
     private CheckBox mCheckBoxIsComplete;
+
+    private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
+    private File mPhotoFile;
 
     /*
     Rather than the calling the constructor directly, Activity(s) should call newInstance
@@ -65,6 +82,8 @@ public class TodoFragment extends Fragment {
 
         mTodo = TodoModel.get(getActivity()).getTodo(todoId);
 
+        mPhotoFile = TodoModel.get(getActivity()).getPhotoFile(mTodo);
+
     }
 
     @Nullable
@@ -102,13 +121,73 @@ public class TodoFragment extends Fragment {
         mCheckBoxIsComplete.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d("DEBUG **** TodoFragment","called onCheckedChanged");
+                Log.d("DEBUG **** TodoFragment", "called onCheckedChanged");
                 mTodo.setComplete(isChecked);
             }
         });
 
+        mPhotoButton = (ImageButton) view.findViewById(R.id.todo_camera);
+        mPhotoView = (ImageView) view.findViewById(R.id.todo_photo);
+
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        PackageManager packageManager = getActivity().getPackageManager();
+        boolean canTakePhoto = mPhotoFile != null &&
+                captureImage.resolveActivity(packageManager) != null;
+        mPhotoButton.setEnabled(canTakePhoto);
+
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "com.example.todolistapp.fileprovider",
+                        mPhotoFile);
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+
+                List<ResolveInfo> cameraAcivities = getActivity()
+                        .getPackageManager().queryIntentActivities(captureImage,
+                                PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo activity : cameraAcivities) {
+                    getActivity().grantUriPermission(activity.activityInfo.packageName,
+                            uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
+
+                startActivityForResult(captureImage, REQUEST_PHOTO);
+
+            }
+        });
+
+        mPhotoView = (ImageView) view.findViewById(R.id.todo_photo);
+        updatePhotoView();
+
         return view;
 
     }
+
+    private void updatePhotoView(){
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            mPhotoView.setImageBitmap(bitmap);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (resultCode != Activity.RESULT_OK){
+            return;
+        } else if (requestCode == REQUEST_PHOTO) {
+            Uri uri = FileProvider.getUriForFile(getActivity(),
+                    "com.example.todolistapp.fileprovider",
+                    mPhotoFile);
+
+            getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+            updatePhotoView();
+        }
+    }
+
 }
 

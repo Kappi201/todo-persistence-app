@@ -2,16 +2,20 @@ package com.example.todolistapp;
 
 import android.content.Context;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class TodoModel {
 
     private static TodoModel sTodoModel;
-
+    private static Context mContext;
     private ArrayList<Todo> mTodoList;
 
     public static TodoModel get(Context context) {
+
+        mContext = context.getApplicationContext();
+
         if (sTodoModel == null) {
             sTodoModel = new TodoModel(context);
         }
@@ -56,6 +60,11 @@ public class TodoModel {
 
         mTodoList.add(todo);
 
+    }
+
+    public File getPhotoFile(Todo todo){
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, todo.getPhotoFilename());
     }
 
 }
