@@ -79,11 +79,15 @@ public class TodoFragment extends Fragment {
         */
 
         UUID todoId = (UUID) getArguments().getSerializable(ARG_TODO_ID);
-
         mTodo = TodoModel.get(getActivity()).getTodo(todoId);
-
         mPhotoFile = TodoModel.get(getActivity()).getPhotoFile(mTodo);
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        TodoModel.get(getActivity()).updateTodo(mTodo);
     }
 
     @Nullable
@@ -122,7 +126,7 @@ public class TodoFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.d("DEBUG **** TodoFragment", "called onCheckedChanged");
-                mTodo.setComplete(isChecked);
+                mTodo.setComplete(isChecked==true ? 1 : 0);
             }
         });
 
@@ -139,16 +143,18 @@ public class TodoFragment extends Fragment {
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Uri uri = FileProvider.getUriForFile(getActivity(),
                         "com.example.todolistapp.fileprovider",
                         mPhotoFile);
+
                 captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 
-                List<ResolveInfo> cameraAcivities = getActivity()
+                List<ResolveInfo> cameraActivities = getActivity()
                         .getPackageManager().queryIntentActivities(captureImage,
                                 PackageManager.MATCH_DEFAULT_ONLY);
 
-                for (ResolveInfo activity : cameraAcivities) {
+                for (ResolveInfo activity : cameraActivities) {
                     getActivity().grantUriPermission(activity.activityInfo.packageName,
                             uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 }

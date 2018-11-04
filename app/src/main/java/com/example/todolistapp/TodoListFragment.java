@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TodoListFragment extends Fragment {
@@ -50,15 +49,20 @@ public class TodoListFragment extends Fragment {
 
 
     private void updateUI(){
-
-        ArrayList todos = new ArrayList<>();
+/*
+        ArrayList todoList = new ArrayList<>();
         TodoModel todoModel = TodoModel.get(getContext());
-        todos = todoModel.getTodos();
+        todoList = todoModel.getTodoList();
+ */
+        TodoModel todoModel = TodoModel.get(getActivity());
+        List<Todo> todoList = todoModel.getTodoList();
+
 
         if (mTodoAdapter == null) {
-            mTodoAdapter = new TodoAdapter(todos);
+            mTodoAdapter = new TodoAdapter(todoList);
             mTodoRecyclerView.setAdapter(mTodoAdapter);
         } else {
+            mTodoAdapter.setTodoList(todoList);
             mTodoAdapter.notifyDataSetChanged();
         }
 
@@ -106,10 +110,10 @@ public class TodoListFragment extends Fragment {
 
     public class TodoAdapter extends RecyclerView.Adapter<TodoListFragment.TodoHolder> {
 
-        private List<Todo> mTodos;
+        private List<Todo> mTodoList;
 
         public TodoAdapter(List<Todo> todos) {
-            mTodos = todos;
+            mTodoList = todos;
         }
 
         @Override
@@ -121,14 +125,17 @@ public class TodoListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(TodoHolder holder, int position) {
-            Todo todo = mTodos.get(position);
+            Todo todo = mTodoList.get(position);
             holder.bind(todo);
         }
 
         @Override
         public int getItemCount() {
-            return mTodos.size();
+            return mTodoList.size();
         }
 
+        public void setTodoList(List<Todo> todoList) {
+            mTodoList = todoList;
+        }
     }
 }

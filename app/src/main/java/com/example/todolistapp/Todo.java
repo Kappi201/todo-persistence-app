@@ -9,10 +9,17 @@ public class Todo {
     private String mTitle;
     private String mDetail;
     private Date mDate;
-    private boolean mIsComplete;
+    private int mIsComplete;
 
     public Todo() {
+        this(UUID.randomUUID());
+        /*
         mId = UUID.randomUUID();
+        mDate = new Date();
+        */
+    }
+    public Todo(UUID id){
+        mId = id;
         mDate = new Date();
     }
 
@@ -52,11 +59,11 @@ public class Todo {
         mDate = date;
     }
 
-    public boolean isComplete() {
+    public int isComplete() {
         return mIsComplete;
     }
 
-    public void setComplete(boolean complete) {
+    public void setComplete(int complete) {
         mIsComplete = complete;
     }
 
