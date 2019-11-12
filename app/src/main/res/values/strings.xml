@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TodoListApp</string>
+    <string name="app_name">TodoPersistenceApp</string>
     <string name="todo_title">todo title</string>
     <string name="todo_title_hint">todo title hint</string>
     <string name="todo_title_label">One line description of the todo</string>
