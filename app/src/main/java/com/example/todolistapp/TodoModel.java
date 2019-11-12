@@ -14,14 +14,14 @@ import database.TodoBaseHelper;
 import database.TodoCursorWrapper;
 import database.TodoDbSchema;
 
-public class TodoModel {
+class TodoModel {
 
     private static TodoModel sTodoModel;
     private static Context mContext;
 //    private ArrayList<Todo> mTodoList;
     private SQLiteDatabase mDatabase;
 
-    public static TodoModel get(Context context) {
+    static TodoModel get(Context context) {
 
         mContext = context.getApplicationContext();
 
@@ -41,9 +41,9 @@ public class TodoModel {
 
         // refactor to pattern for data plugins
         // simulate some data for testing
-/*
+
 // uncomment block for test data into the database
-        for (int i=0; i < 3; i++){
+        for (int i=0; i < 30; i++){
             Todo todo = new Todo();
             todo.setTitle("Todo title " + i);
             todo.setDetail("Detail for task " + todo.getId().toString());
@@ -52,10 +52,10 @@ public class TodoModel {
             addTodo(todo);
  //           mTodoList.add(todo);
         }
-*/
+
     }
 
-    public void updateTodo(Todo todo){
+    void updateTodo(Todo todo){
         String uuidString = todo.getId().toString();
         ContentValues values = getContentValues(todo);
 
@@ -93,52 +93,45 @@ public class TodoModel {
         return values;
     }
 
-    public List<Todo> getTodoList() {
+    List<Todo> getTodoList() {
         /* return mTodoList;
         return new ArrayList<>(); */
 
         List<Todo> todoList = new ArrayList<>();
 
-        TodoCursorWrapper cursor = queryTodoList(null, null);
-        try {
+        try (TodoCursorWrapper cursor = queryTodoList(null, null)) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 todoList.add(cursor.getTodo());
                 cursor.moveToNext();
             }
-        } finally {
-            cursor.close();
         }
 
         return todoList;
 
     }
 
-    public Todo getTodo(UUID id){
+    Todo getTodo(UUID id){
 
-        TodoCursorWrapper cursor = queryTodoList(
+        try (TodoCursorWrapper cursor = queryTodoList(
                 TodoDbSchema.TodoTable.Cols.UUID + " = ?",
-                new String[] {id.toString() }
-        );
-
-        try {
+                new String[]{id.toString()}
+        )) {
             if (cursor.getCount() == 0) {
                 return null;
             }
             cursor.moveToFirst();
             return cursor.getTodo();
-        } finally {
-            cursor.close();
         }
     }
 
-    public void addTodo(Todo todo){
+    private void addTodo(Todo todo){
 //        mTodoList.add(todo);
         ContentValues values = getContentValues(todo);
         mDatabase.insert(TodoDbSchema.TodoTable.NAME, null, values);
     }
 
-    public File getPhotoFile(Todo todo){
+    File getPhotoFile(Todo todo){
         File filesDir = mContext.getFilesDir();
         return new File(filesDir, todo.getPhotoFilename());
     }
