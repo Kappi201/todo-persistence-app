@@ -49,7 +49,7 @@ class TodoModel {
             todo.setDetail("Detail for task " + todo.getId().toString());
             todo.setComplete(0);
 
-            addTodo(todo);
+            //addTodo(todo);
  //           mTodoList.add(todo);
         }
 
@@ -64,6 +64,16 @@ class TodoModel {
         mDatabase.update(TodoDbSchema.TodoTable.NAME, values,
                 TodoDbSchema.TodoTable.Cols.UUID + " = ?",
                 new String[] { uuidString });
+    }
+
+    public void deleteTodo(Todo todo) {
+        String uuidString = todo.getId().toString();
+
+        mDatabase.delete(
+                TodoDbSchema.TodoTable.NAME,
+                TodoDbSchema.TodoTable.Cols.UUID + " = ?",
+                new String[] { uuidString });
+
     }
 
     private TodoCursorWrapper queryTodoList(String whereClause, String[] whereArgs) {
@@ -130,6 +140,8 @@ class TodoModel {
         ContentValues values = getContentValues(todo);
         mDatabase.insert(TodoDbSchema.TodoTable.NAME, null, values);
     }
+
+
 
     File getPhotoFile(Todo todo){
         File filesDir = mContext.getFilesDir();

@@ -1,6 +1,7 @@
 package com.example.todolistapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -24,6 +25,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
@@ -37,6 +39,7 @@ public class TodoFragment extends Fragment {
     private Todo mTodo;
     private EditText mEditTextTitle;
     private Button mButtonDate;
+    private Button mButtonDelete;
     private CheckBox mCheckBoxIsComplete;
 
     private ImageButton mPhotoButton;
@@ -121,6 +124,8 @@ public class TodoFragment extends Fragment {
         mButtonDate.setText(mTodo.getDate().toString());
         mButtonDate.setEnabled(false);
 
+        mButtonDelete = (Button) view.findViewById(R.id.todo_delete);
+
         mCheckBoxIsComplete = (CheckBox) view.findViewById(R.id.todo_complete);
         mCheckBoxIsComplete.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -163,6 +168,22 @@ public class TodoFragment extends Fragment {
 
             }
         });
+
+        mButtonDelete.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                /*Toast.makeText(
+                        getActivity(),
+                        mTodo.getTitle() + " clicked",
+                        Toast.LENGTH_SHORT)
+                        .show();*/
+                Intent intent = new Intent(v.getContext(), TodoListActivity.class);
+                //mTodo.setTitle("it worked");
+                TodoModel.get(getActivity()).deleteTodo(mTodo);
+                startActivityForResult(intent, 0);
+            }
+        });
+
 
         mPhotoView = (ImageView) view.findViewById(R.id.todo_photo);
         updatePhotoView();
