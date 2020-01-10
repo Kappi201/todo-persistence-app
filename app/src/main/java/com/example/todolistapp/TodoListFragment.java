@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class TodoListFragment extends Fragment {
 
     private RecyclerView mTodoRecyclerView;
+    private Button mButtonAdd;
+
     TodoAdapter mTodoAdapter;
 
     @Override
@@ -35,7 +38,39 @@ public class TodoListFragment extends Fragment {
         mTodoRecyclerView = (RecyclerView) view.findViewById(R.id.todo_recycler_view);
         mTodoRecyclerView.setLayoutManager( new LinearLayoutManager(getActivity()) );
 
+
+
+        mButtonAdd = (Button) view.findViewById(R.id.todo_add);
+
+        mButtonAdd.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+
+
+                Todo todo = new Todo();
+                todo.setTitle("New Todo");
+                todo.setDetail("Detail for new Todo");
+                todo.setComplete(0);
+
+
+
+                TodoModel.get(getActivity()).addTodo(todo);
+
+                Intent intent = TodoActivity.newIntent(getActivity(), todo.getId());
+
+                Toast.makeText(
+                        getActivity(),
+                        "New Item added",
+                        Toast.LENGTH_SHORT)
+                        .show();
+                startActivityForResult(intent, 0);
+            }
+        });
+
         updateUI();
+
+
 
         return view;
 

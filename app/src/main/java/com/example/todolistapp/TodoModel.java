@@ -135,7 +135,7 @@ class TodoModel {
         }
     }
 
-    private void addTodo(Todo todo){
+    public void addTodo(Todo todo){
 //        mTodoList.add(todo);
         ContentValues values = getContentValues(todo);
         mDatabase.insert(TodoDbSchema.TodoTable.NAME, null, values);
